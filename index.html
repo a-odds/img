@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMG Gallery</title>
+    <link rel="icon" href="https://img.icons8.com/officel/80/instagram-new.png">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fafafa;
+        }
+        .header {
+            text-align: center;
+            padding: 15px 10px;
+            background: #fff;
+            border-bottom: 1px solid #dbdbdb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 400px; 
+            padding: 10px 15px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            background: #efefef;
+            outline: none;
+            font-size: 16px;
+        }
+        .search-box:focus {
+            border-color: #a8a8a8;
+        }
+        .gallery-container {
+            max-width: 935px;
+            margin: 20px auto;
+            padding: 0 5px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+        }
+        .grid-item {
+            position: relative;
+            aspect-ratio: 10 / 16;
+            overflow: hidden;
+            background: #efefef;
+        }
+        .id-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
+            pointer-events: none; /* ทำให้คลิกทะลุไปที่รูปได้ */
+        }
+        .grid-item a {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .grid-item:hover img {
+            transform: scale(1.05);
+        }
+        /* ปรับสำหรับหน้าจอมือถือ (Responsive 1 คอลัมน์) */
+        @media (max-width: 768px) {
+            .grid { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+            }
+            .gallery-container { 
+                margin: 15px auto; 
+                padding: 0 15px; 
+            }
+            .grid-item {
+                border-radius: 8px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <!-- ระบบจะแสดงจำนวน id ทั้งหมดแบบอัตโนมัติ -->
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 ค้นหา (Search)...จำนวน id ทั้งหมด 3" onkeyup="filterImages()">
+    </div>
+
+    <div class="gallery-container">
+        <div class="grid" id="imageGrid">
+
+            <div class="grid-item" data-id="1" data-title="img-1" title="ID: 1 | IMG-1">
+                <span class="id-badge">#1</span>
+                <a href="IMG-1.html" target="_blank">
+                    <img src="https://pub-8ef5b0979a3d49d4ac6ce30aa88c0071.r2.dev/IMG-1/2025-W16/4dc4fb67-2497-4b5e-a214-7fc74aedcc72.jpg" alt="IMG-1" loading="lazy">
+                </a>
+            </div>
+            <div class="grid-item" data-id="2" data-title="img-2" title="ID: 2 | IMG-2">
+                <span class="id-badge">#2</span>
+                <a href="IMG-2.html" target="_blank">
+                    <img src="https://pub-8ef5b0979a3d49d4ac6ce30aa88c0071.r2.dev/IMG-2/2025-W22/maxresde24299fault.webp" alt="IMG-2" loading="lazy">
+                </a>
+            </div>
+            <div class="grid-item" data-id="3" data-title="img-3" title="ID: 3 | IMG-3">
+                <span class="id-badge">#3</span>
+                <a href="IMG-3.html" target="_blank">
+                    <img src="https://pub-8ef5b0979a3d49d4ac6ce30aa88c0071.r2.dev/IMG-3/2025-W42/26a5350b6c05446df.gif" alt="IMG-3" loading="lazy">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterImages() {
+            const input = document.getElementById('searchInput').value.trim().toLowerCase();
+            const items = document.querySelectorAll('.grid-item');
+            
+            // เช็คว่าช่องค้นหากรอกแต่ตัวเลขใช่หรือไม่
+            const isNumberOnly = /^\d+$/.test(input);
+            
+            items.forEach(item => {
+                const title = item.getAttribute('data-title');
+                const id = item.getAttribute('data-id');
+                
+                if (input === '') {
+                    item.style.display = '';
+                } else if (isNumberOnly) {
+                    // หากกรอกตัวเลข จะค้นหาจาก ID ที่เริ่มต้นด้วยเลขนั้น (เพื่อให้พิมพ์ 12 แล้วขึ้นเลยโดยไม่ต้องรอพิมพ์เสร็จ)
+                    // หากต้องการให้ตรงเป๊ะ เปลี่ยนเป็น: if (id === input)
+                    if (id.startsWith(input)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else {
+                    // หากกรอกตัวอักษร จะค้นหาจาก Hover Title
+                    if (title.includes(input)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
